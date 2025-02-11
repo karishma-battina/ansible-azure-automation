@@ -6,5 +6,10 @@ variable "resource_group_location" {
 
 variable "resource_group_name" {
   type        = string
-  description = "Location of the resource group."
+  description = "Name of the resource group."
+}
+
+variable "network_name" {
+  type        = string
+  description = "Name of the network."
 }
