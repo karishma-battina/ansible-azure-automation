@@ -1,3 +1,13 @@
+# Terraform backend
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "storage-rg"
+    storage_account_name = "tfbackend23"
+    container_name       = "default"
+    key                  = "tf-ansible.tfstate"
+  }
+}
+
 # Resource Group
 resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
