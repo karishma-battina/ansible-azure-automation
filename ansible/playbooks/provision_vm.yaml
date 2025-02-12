@@ -1,0 +1,20 @@
+---
+- name: Provision Azure VMs
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Create a VM in Azure
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: network-rg
+        name: ansiblevm
+        vm_size: Standard_DS1_v2
+        admin_username: azureuser
+        admin_password: 'MyPassword123'
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: 18.04-LTS
+          version: latest
+        network_interface_names: [ "myVMNic" ]
+        state: present

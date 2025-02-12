@@ -1,0 +1,24 @@
+{
+    // Name this configuration
+    "name": "Codespace for Argocd project",
+    // Use the base codespace image
+    "image": "mcr.microsoft.com/vscode/devcontainers/universal:latest",
+  
+    "remoteUser": "codespace",
+    "overrideCommand": false
+     ,
+   // Add the IDs of extensions you want installed when the container is created.
+   "customizations": {
+       "vscode": {
+           "extensions": [
+               "GitHub.copilot"
+           ]
+       },
+},
+"features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers-extra/features/ansible:2": {},
+    "ghcr.io/devcontainers-extra/features/terraform-asdf:2": {}
+}
+  }
