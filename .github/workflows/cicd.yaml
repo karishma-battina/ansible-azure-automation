@@ -70,6 +70,7 @@ jobs:
         shell: bash
         working-directory: ./ansible
 
+    steps:
     - name: Ansible?
       run: ansible
       
