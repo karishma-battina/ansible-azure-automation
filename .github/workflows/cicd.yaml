@@ -59,3 +59,18 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/feature' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
+
+jobs:
+  ansible:
+    name: 'Ansible'
+    runs-on: ubuntu-latest
+    environment: dev
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./ansible
+
+    - name: Ansible?
+      run: ansible
+      
