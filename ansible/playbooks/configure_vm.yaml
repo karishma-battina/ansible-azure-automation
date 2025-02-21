@@ -1,0 +1,82 @@
+---
+- name: Configure newly provisioned VM
+  hosts: all
+  become: yes
+  vars:
+    admin_user: ansible_admin
+    ssh_port: 2222
+    allowed_ports:
+      - "{{ ssh_port }}"
+      - "80"
+      - "443"
+    packages:
+      - curl
+      - wget
+      - git
+      - tmux
+      - htop
+      - fail2ban
+
+  tasks:
+    # Update system packages
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Update all packages
+      ansible.builtin.package:
+        name: "*"
+        state: latest
+
+    # Install common utilities
+    - name: Install base packages
+      ansible.builtin.package:
+        name: "{{ packages }}"
+        state: present
+
+    # Create admin user
+    - name: Create admin user
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        groups: sudo
+        append: yes
+        shell: /bin/bash
+        password: "{{ 'Password123!' | password_hash('sha512') }}"
+
+    # Deploy SSH keys
+    - name: Add SSH public key
+      ansible.builtin.authorized_key:
+        user: "{{ admin_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    # Harden SSH
+    - name: Configure SSH daemon
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { regexp: '^#?Port', line: 'Port {{ ssh_port }}' }
+        - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+        - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+      notify: restart sshd
+
+    # Configure firewall
+    - name: Enable UFW firewall
+      ansible.builtin.ufw:
+        state: enabled
+        policy: deny
+
+    - name: Allow required ports
+      ansible.builtin.ufw:
+        rule: allow
+        port: "{{ item }}"
+      loop: "{{ allowed_ports }}"
+
+  handlers:
+    - name: restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
